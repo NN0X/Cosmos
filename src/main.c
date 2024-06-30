@@ -14,6 +14,11 @@ struct Buffer
     Vector2 size;
 } typedef Buffer;
 
+struct Sprite
+{
+    Buffer *buffer;
+} typedef Sprite;
+
 Buffer *createBuffer(Vector2 size)
 {
     size.x /= 8;
@@ -29,6 +34,20 @@ void fillBuffer(Buffer *buffer, char fill)
     for (int i = 0; i < buffer->size.x * buffer->size.y; i++)
     {
         buffer->data[i] = fill;
+    }
+}
+
+void insertToBuffer(Buffer *buffer, Sprite sprite, Vector2 position)
+{
+    position.x /= 8;
+    position.y /= 16;
+
+    for (int y = 0; y < sprite.buffer->size.y; y++)
+    {
+        for (int x = 0; x < sprite.buffer->size.x; x++)
+        {
+            buffer->data[(position.y + y) * buffer->size.x + position.x + x] = sprite.buffer->data[y * sprite.buffer->size.x + x];
+        }
     }
 }
 
@@ -88,32 +107,52 @@ void init(Vector2 size)
     SetConsoleMode(hOutput, prev_mode_out | ENABLE_PROCESSED_OUTPUT);
 }
 
-void changeColor(int color)
-{
-    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
-}
-
 int main()
 {
     Vector2 size = {800, 600};
 
     init(size);
 
-    // set blue color
-    changeColor(9);
-
     Buffer *buffer = createBuffer(size);
     fillBuffer(buffer, 219);
 
+    Sprite sprite;
+    sprite.buffer = createBuffer((Vector2){20, 20});
+    fillBuffer(sprite.buffer, ' ');
+
+    Sprite fpsCounter;
+    fpsCounter.buffer = createBuffer((Vector2){3 * 8, 16});
+    fillBuffer(fpsCounter.buffer, ' ');
+
+    Vector2 position = {400, 500};
+    int frame = 0;
+    int fps = 0;
+    int time = GetTickCount();
     while (1)
     {
         renderBuffer(buffer);
+        fillBuffer(buffer, 219);
+        insertToBuffer(buffer, sprite, position);
+
+        fillBuffer(fpsCounter.buffer, ' ');
+        sprintf(fpsCounter.buffer->data, "%d", fps);
+        insertToBuffer(buffer, fpsCounter, (Vector2){0, 0});
+
+        if (GetAsyncKeyState(VK_LEFT))
+        {
+            position.x -= 8;
+        }
+        if (GetAsyncKeyState(VK_RIGHT))
+        {
+            position.x += 8;
+        }
+
         if (GetAsyncKeyState(VK_ESCAPE))
         {
             break;
         }
         // sleep ms
-        Sleep(1000 / 60);
+        Sleep(1000 / 120);
     }
 
     return 0;
