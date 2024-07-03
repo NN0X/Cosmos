@@ -8,16 +8,23 @@ struct Vector2
     int y;
 } typedef Vector2;
 
+struct dVector2
+{
+    double x;
+    double y;
+} typedef dVector2;
+
 struct Buffer
 {
     char *data;
     Vector2 size;
 } typedef Buffer;
 
-struct Sprite
+struct Object
 {
     Buffer *buffer;
-} typedef Sprite;
+    dVector2 position;
+} typedef Object;
 
 Buffer *createBuffer(Vector2 size)
 {
@@ -37,16 +44,16 @@ void fillBuffer(Buffer *buffer, char fill)
     }
 }
 
-void insertToBuffer(Buffer *buffer, Sprite sprite, Vector2 position)
+void insertToBuffer(Buffer *buffer, Buffer *insterted, Vector2 position)
 {
     position.x /= 8;
     position.y /= 16;
 
-    for (int y = 0; y < sprite.buffer->size.y; y++)
+    for (int y = 0; y < insterted->size.y; y++)
     {
-        for (int x = 0; x < sprite.buffer->size.x; x++)
+        for (int x = 0; x < insterted->size.x; x++)
         {
-            buffer->data[(position.y + y) * buffer->size.x + position.x + x] = sprite.buffer->data[y * sprite.buffer->size.x + x];
+            buffer->data[(position.y + y) * buffer->size.x + position.x + x] = insterted->data[y * insterted->size.x + x];
         }
     }
 }
@@ -55,7 +62,6 @@ void renderBuffer(Buffer *buffer)
 {
     COORD coord = {0, 0};
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
-
     WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), buffer->data, buffer->size.x * buffer->size.y, NULL, NULL);
 }
 
@@ -105,10 +111,25 @@ void init(Vector2 size)
     DWORD prev_mode_out;
     GetConsoleMode(hOutput, &prev_mode_out);
     SetConsoleMode(hOutput, prev_mode_out | ENABLE_PROCESSED_OUTPUT);
+
+    // enable ansi colors
+    system("color");
 }
+
+void getDeltaTime(LARGE_INTEGER *time, LARGE_INTEGER frequency, int *deltaTime)
+{
+    LARGE_INTEGER currentTime;
+    QueryPerformanceCounter(&currentTime);
+    *deltaTime = (currentTime.QuadPart - time->QuadPart) * 1000 / frequency.QuadPart;
+    *time = currentTime;
+}
+
+#define MOV_VERT 8
+#define MOV_HOR 16
 
 int main()
 {
+
     Vector2 size = {800, 600};
 
     init(size);
@@ -116,44 +137,57 @@ int main()
     Buffer *buffer = createBuffer(size);
     fillBuffer(buffer, 219);
 
-    Sprite sprite;
-    sprite.buffer = createBuffer((Vector2){20, 20});
-    fillBuffer(sprite.buffer, ' ');
+    Object player;
+    player.position = (dVector2){400, 550};
+    player.buffer = createBuffer((Vector2){20, 20});
+    fillBuffer(player.buffer, ' ');
 
-    Sprite fpsCounter;
-    fpsCounter.buffer = createBuffer((Vector2){3 * 8, 16});
-    fillBuffer(fpsCounter.buffer, ' ');
+    Object debugData;
+    debugData.position = (dVector2){0, 0};
+    debugData.buffer = createBuffer((Vector2){(4 + 3) * 8, 16}); // 4 - 'FPS: ', 3 - number
+    fillBuffer(debugData.buffer, ' ');
 
-    Vector2 position = {400, 500};
-    int frame = 0;
+    LARGE_INTEGER time;
+    LARGE_INTEGER frequency;
+    QueryPerformanceFrequency(&frequency);
+    QueryPerformanceCounter(&time);
+    int deltaTime = 0;
     int fps = 0;
-    int time = GetTickCount();
+    int speed = 50;
     while (1)
     {
         renderBuffer(buffer);
         fillBuffer(buffer, 219);
-        insertToBuffer(buffer, sprite, position);
+        insertToBuffer(buffer, player.buffer, (Vector2){player.position.x, player.position.y});
 
-        fillBuffer(fpsCounter.buffer, ' ');
-        sprintf(fpsCounter.buffer->data, "%d", fps);
-        insertToBuffer(buffer, fpsCounter, (Vector2){0, 0});
+        fillBuffer(debugData.buffer, ' ');
+        sprintf(debugData.buffer->data, "FPS: %d", fps);
+        insertToBuffer(buffer, debugData.buffer, (Vector2){debugData.position.x, debugData.position.y});
 
-        if (GetAsyncKeyState(VK_LEFT))
+        if (GetAsyncKeyState(VK_LEFT) || GetAsyncKeyState('A'))
         {
-            position.x -= 8;
+            player.position.x -= MOV_VERT * deltaTime / 1000.0 * speed;
         }
-        if (GetAsyncKeyState(VK_RIGHT))
+        if (GetAsyncKeyState(VK_RIGHT) || GetAsyncKeyState('D'))
         {
-            position.x += 8;
+            player.position.x += MOV_VERT * deltaTime / 1000.0 * speed;
         }
 
         if (GetAsyncKeyState(VK_ESCAPE))
         {
             break;
         }
-        // sleep ms
-        Sleep(1000 / 120);
+
+        getDeltaTime(&time, frequency, &deltaTime);
+        if (deltaTime != 0)
+            fps = 1000 / deltaTime;
+
+        Sleep(1);
     }
+
+    destroyBuffer(buffer);
+    destroyBuffer(player.buffer);
+    destroyBuffer(debugData.buffer);
 
     return 0;
 }
