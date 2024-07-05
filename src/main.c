@@ -7,24 +7,21 @@
 #include "object.h"
 #include "console.h"
 #include "utility.h"
-
-#define MOV_VERT 8
-#define MOV_HOR 16
+#include "defines.h"
 
 int main()
 {
-
     Vector2 size = {800, 600};
 
     initConsole(size);
 
     Buffer buffer = createBuffer(size);
-    fillBuffer(&buffer, 219);
+    fillBuffer(&buffer, (char)219);
 
-    Object player = createObject((Vector2){20, 20}, (dVector2){400, 550});
+    Object player = createObject(newVector2(20, 20), newDVector2(400, 550));
     fillBuffer(&player.buffer, ' ');
 
-    Object debugData = createObject((Vector2){(4 + 3) * 8, 16}, (dVector2){0, 0}); // 4 - 'FPS: ', 3 - number
+    Object debugData = createObject(newVector2((4 + 3) * 8, 16), newDVector2(0, 0)); // 4 - 'FPS: ', 3 - number
     fillBuffer(&debugData.buffer, ' ');
 
     Timer *timer = createTimer();
@@ -33,12 +30,12 @@ int main()
     while (1)
     {
         renderBuffer(&buffer);
-        fillBuffer(&buffer, 219);
-        insertToBuffer(&buffer, &player.buffer, (Vector2){player.position.x, player.position.y});
+        fillBuffer(&buffer, (char)219);
+        insertToBuffer(&buffer, &player.buffer, newVector2(player.position.x, player.position.y));
 
         fillBuffer(&debugData.buffer, ' ');
         sprintf(debugData.buffer.data, "FPS: %d", fps);
-        insertToBuffer(&buffer, &debugData.buffer, (Vector2){debugData.position.x, debugData.position.y});
+        insertToBuffer(&buffer, &debugData.buffer, newVector2(debugData.position.x, debugData.position.y));
 
         if (GetAsyncKeyState(VK_LEFT) || GetAsyncKeyState('A'))
         {

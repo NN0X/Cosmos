@@ -41,6 +41,6 @@ void initConsole(Vector2 size)
     GetConsoleMode(hOutput, &prev_mode_out);
     SetConsoleMode(hOutput, prev_mode_out | ENABLE_PROCESSED_OUTPUT);
 
-    // enable ansi colors
-    system("color");
+    // enable ansi escape codes
+    SetConsoleMode(hOutput, prev_mode_out | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
 }
