@@ -9,13 +9,11 @@
 struct Buffer
 {
     char *data;
-    Vector2 size;
+    int size;
 } typedef Buffer;
 
-Buffer createBuffer(Vector2 size);
+Buffer createBuffer(int size);
 void fillBuffer(Buffer *buffer, char fill);
-void insertToBuffer(Buffer *buffer, Buffer *insterted, Vector2 position);
-void renderBuffer(Buffer *buffer);
 void destroyBuffer(Buffer *buffer);
 
 #endif
