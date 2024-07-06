@@ -9,6 +9,7 @@
 #include "console.h"
 #include "utility.h"
 #include "defines.h"
+#include "input.h"
 
 int main()
 {
@@ -37,24 +38,29 @@ int main()
         sprintf(debugData.buffer.data, "FPS: %d", fps);
         renderToScreen(&screen, &debugData, WHITE, BLACK_BG);
 
-        if (GetAsyncKeyState(VK_LEFT) || GetAsyncKeyState('A'))
+        if (isKeyPressed(KEY_LEFT) || isKeyPressed(KEY_A))
         {
             moveObject(&player, newDVector2(-1, 0), speed * timer->deltaTime / 1000.0, wrapMovementAroundScreen, (void *)&size);
         }
-        if (GetAsyncKeyState(VK_RIGHT) || GetAsyncKeyState('D'))
+        if (isKeyPressed(KEY_RIGHT) || isKeyPressed(KEY_D))
         {
             moveObject(&player, newDVector2(1, 0), speed * timer->deltaTime / 1000.0, wrapMovementAroundScreen, (void *)&size);
         }
-        if (GetAsyncKeyState(VK_UP) || GetAsyncKeyState('W'))
+        if (isKeyPressed(KEY_UP) || isKeyPressed(KEY_W))
         {
             moveObject(&player, newDVector2(0, -1), speed * timer->deltaTime / 1000.0, wrapMovementAroundScreen, (void *)&size);
         }
-        if (GetAsyncKeyState(VK_DOWN) || GetAsyncKeyState('S'))
+        if (isKeyPressed(KEY_DOWN) || isKeyPressed(KEY_S))
         {
             moveObject(&player, newDVector2(0, 1), speed * timer->deltaTime / 1000.0, wrapMovementAroundScreen, (void *)&size);
         }
 
-        if (GetAsyncKeyState(VK_ESCAPE))
+        if (isMouseLeftPressed())
+        {
+            setPositionObject(&player, getMousePosition(&screen), limitMovementToScreen, (void *)&size);
+        }
+
+        if (isKeyPressed(KEY_ESCAPE))
         {
             break;
         }
