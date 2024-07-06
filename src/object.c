@@ -15,9 +15,20 @@ void destroyObject(Object *object)
     destroyBuffer(&object->buffer);
 }
 
-Object convertToScreen(Vector2 screenSize, Object *object)
+void moveObject(Object *object, dVector2 direction, double speed, void (*movementModifier)(Object *, void *), void *args)
 {
-    if (object->size.x + object->position.x > screenSize.x + MOV_VERT)
+    object->position.x += direction.x * MOV_VERT * speed;
+    object->position.y += direction.y * MOV_HOR * speed;
+    if (movementModifier != NULL)
+    {
+        movementModifier(object, args);
+    }
+}
+
+void limitMovementToScreen(Object *object, void *screenSizeP)
+{
+    Vector2 screenSize = *(Vector2 *)screenSizeP;
+    if (object->position.x + object->size.x > screenSize.x + MOV_VERT)
     {
         object->position.x = screenSize.x - object->size.x + MOV_VERT;
     }
@@ -34,10 +45,26 @@ Object convertToScreen(Vector2 screenSize, Object *object)
     {
         object->position.y = 0;
     }
+}
 
-    Vector2 sizeAdjusted = {object->size.x / MOV_VERT, object->size.y / MOV_HOR};
-    dVector2 positionAdjusted = {object->position.x / MOV_VERT, object->position.y / MOV_HOR};
-    Object objectAdjusted = createObject(sizeAdjusted, positionAdjusted);
+void wrapMovementAroundScreen(Object *object, void *screenSizeP)
+{
+    Vector2 screenSize = *(Vector2 *)screenSizeP;
+    if (object->position.x + object->size.x > screenSize.x + MOV_VERT)
+    {
+        object->position.x = 0;
+    }
+    else if (object->position.x < 0)
+    {
+        object->position.x = screenSize.x - object->size.x + MOV_VERT;
+    }
 
-    return objectAdjusted;
+    if (object->position.y + object->size.y > screenSize.y)
+    {
+        object->position.y = 0;
+    }
+    else if (object->position.y < 0)
+    {
+        object->position.y = screenSize.y - object->size.y;
+    }
 }

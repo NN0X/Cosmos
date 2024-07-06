@@ -15,6 +15,9 @@ struct Object
 Object createObject(Vector2 size, dVector2 position);
 void destroyObject(Object *object);
 
-Object convertToScreen(Vector2 screenSize, Object *object);
+void moveObject(Object *object, dVector2 direction, double speed, void (*movementModifier)(Object *, void *), void *args);
+
+void limitMovementToScreen(Object *object, void *screenSizeP);
+void wrapMovementAroundScreen(Object *object, void *screenSizeP);
 
 #endif

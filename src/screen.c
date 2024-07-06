@@ -21,9 +21,28 @@ void renderBackBuffer(Screen *screen, char *foregroundColor, char *backgroundCol
 
 void renderToScreen(Screen *screen, Object *object, char *foregroundColor, char *backgroundColor)
 {
-    Object objectAdjusted = convertToScreen(screen->size, object);
+    Vector2 postitionAdjusted = divideVector2(convertDVector2(object->position), newVector2(MOV_VERT, MOV_HOR));
+    Vector2 sizeAdjusted = divideVector2(object->size, newVector2(MOV_VERT, MOV_HOR));
 
-    COORD coord = {(short)objectAdjusted.position.x, (short)objectAdjusted.position.y};
+    if (postitionAdjusted.x + sizeAdjusted.x > screen->size.x / MOV_VERT)
+    {
+        return;
+    }
+    else if (postitionAdjusted.x < 0)
+    {
+        return;
+    }
+
+    if (postitionAdjusted.y + sizeAdjusted.y > screen->size.y / MOV_HOR)
+    {
+        return;
+    }
+    else if (postitionAdjusted.y < 0)
+    {
+        return;
+    }
+
+    COORD coord = {(short)postitionAdjusted.x, (short)postitionAdjusted.y};
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
     printf(foregroundColor);
     printf(backgroundColor);

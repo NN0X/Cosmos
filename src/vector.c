@@ -24,10 +24,18 @@ dVector2 convertVector2(Vector2 vec)
     return dVec;
 }
 
-Vector2 convertDVector2(Vector2 vec)
+Vector2 convertDVector2(dVector2 vec)
 {
     Vector2 dVec;
     dVec.x = (int)vec.x;
     dVec.y = (int)vec.y;
     return dVec;
+}
+
+Vector2 divideVector2(Vector2 vec, Vector2 divisor)
+{
+    Vector2 result;
+    result.x = vec.x / divisor.x;
+    result.y = vec.y / divisor.y;
+    return result;
 }

@@ -20,7 +20,7 @@ int main()
     fillBuffer(&screen.backBuffer, (char)219);
 
     Object player = createObject(newVector2(20, 20), newDVector2(400, 550));
-    fillBuffer(&player.buffer, '^');
+    fillBuffer(&player.buffer, ' ');
 
     Object debugData = createObject(newVector2((4 + 3) * 8, 16), newDVector2(0, 0)); // 4 - 'FPS: ', 3 - number
     fillBuffer(&debugData.buffer, ' ');
@@ -39,19 +39,19 @@ int main()
 
         if (GetAsyncKeyState(VK_LEFT) || GetAsyncKeyState('A'))
         {
-            player.position.x -= MOV_VERT * timer->deltaTime / 1000.0 * speed;
+            moveObject(&player, newDVector2(-1, 0), speed * timer->deltaTime / 1000.0, wrapMovementAroundScreen, (void *)&size);
         }
         if (GetAsyncKeyState(VK_RIGHT) || GetAsyncKeyState('D'))
         {
-            player.position.x += MOV_VERT * timer->deltaTime / 1000.0 * speed;
+            moveObject(&player, newDVector2(1, 0), speed * timer->deltaTime / 1000.0, wrapMovementAroundScreen, (void *)&size);
         }
         if (GetAsyncKeyState(VK_UP) || GetAsyncKeyState('W'))
         {
-            player.position.y -= MOV_HOR * timer->deltaTime / 1000.0 * speed;
+            moveObject(&player, newDVector2(0, -1), speed * timer->deltaTime / 1000.0, wrapMovementAroundScreen, (void *)&size);
         }
         if (GetAsyncKeyState(VK_DOWN) || GetAsyncKeyState('S'))
         {
-            player.position.y += MOV_HOR * timer->deltaTime / 1000.0 * speed;
+            moveObject(&player, newDVector2(0, 1), speed * timer->deltaTime / 1000.0, wrapMovementAroundScreen, (void *)&size);
         }
 
         if (GetAsyncKeyState(VK_ESCAPE))

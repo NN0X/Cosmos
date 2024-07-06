@@ -17,6 +17,8 @@ Vector2 newVector2(int x, int y);
 dVector2 newDVector2(double x, double y);
 
 dVector2 convertVector2(Vector2 vec);
-Vector2 convertDVector2(Vector2 vec);
+Vector2 convertDVector2(dVector2 vec);
+
+Vector2 divideVector2(Vector2 vec, Vector2 divisor);
 
 #endif
