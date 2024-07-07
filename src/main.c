@@ -9,6 +9,7 @@
 #include "console.h"
 #include "utility.h"
 #include "defines.h"
+#include "input.h"
 
 int main()
 {
@@ -25,8 +26,7 @@ int main()
     Object debugData = createObject(newVector2((4 + 3) * 8, 16), newDVector2(0, 0)); // 4 - 'FPS: ', 3 - number
     fillBuffer(&debugData.buffer, ' ');
 
-    Timer *timer = createTimer();
-    int fps = 0;
+    GameTimer *timer = createGameTimer();
     int speed = 50;
     while (1)
     {
@@ -34,35 +34,37 @@ int main()
         renderToScreen(&screen, &player, RED, GREEN_BG);
 
         fillBuffer(&debugData.buffer, ' ');
-        sprintf(debugData.buffer.data, "FPS: %d", fps);
+        sprintf(debugData.buffer.data, "FPS: %d", timer->fps);
         renderToScreen(&screen, &debugData, WHITE, BLACK_BG);
 
-        if (GetAsyncKeyState(VK_LEFT) || GetAsyncKeyState('A'))
+        if (isKeyPressed(KEY_LEFT) || isKeyPressed(KEY_A))
         {
             moveObject(&player, newDVector2(-1, 0), speed * timer->deltaTime / 1000.0, wrapMovementAroundScreen, (void *)&size);
         }
-        if (GetAsyncKeyState(VK_RIGHT) || GetAsyncKeyState('D'))
+        if (isKeyPressed(KEY_RIGHT) || isKeyPressed(KEY_D))
         {
             moveObject(&player, newDVector2(1, 0), speed * timer->deltaTime / 1000.0, wrapMovementAroundScreen, (void *)&size);
         }
-        if (GetAsyncKeyState(VK_UP) || GetAsyncKeyState('W'))
+        if (isKeyPressed(KEY_UP) || isKeyPressed(KEY_W))
         {
             moveObject(&player, newDVector2(0, -1), speed * timer->deltaTime / 1000.0, wrapMovementAroundScreen, (void *)&size);
         }
-        if (GetAsyncKeyState(VK_DOWN) || GetAsyncKeyState('S'))
+        if (isKeyPressed(KEY_DOWN) || isKeyPressed(KEY_S))
         {
             moveObject(&player, newDVector2(0, 1), speed * timer->deltaTime / 1000.0, wrapMovementAroundScreen, (void *)&size);
         }
 
-        if (GetAsyncKeyState(VK_ESCAPE))
+        if (isMouseLeftPressed())
+        {
+            setPositionObject(&player, getMousePosition(&screen), limitMovementToScreen, (void *)&size);
+        }
+
+        if (isKeyPressed(KEY_ESCAPE))
         {
             break;
         }
 
-        updateTimer(timer);
-        if (timer->deltaTime != 0)
-            fps = 1000 / timer->deltaTime;
-
+        updateGameTimer(timer);
         Sleep(1);
     }
 

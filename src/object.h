@@ -16,7 +16,9 @@ Object createObject(Vector2 size, dVector2 position);
 void destroyObject(Object *object);
 
 void moveObject(Object *object, dVector2 direction, double speed, void (*movementModifier)(Object *, void *), void *args);
+void setPositionObject(Object *object, dVector2 position, void (*movementModifier)(Object *, void *), void *args);
 
+// Movement modifiers
 void limitMovementToScreen(Object *object, void *screenSizeP);
 void wrapMovementAroundScreen(Object *object, void *screenSizeP);
 

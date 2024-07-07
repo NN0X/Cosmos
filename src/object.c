@@ -25,6 +25,15 @@ void moveObject(Object *object, dVector2 direction, double speed, void (*movemen
     }
 }
 
+void setPositionObject(Object *object, dVector2 position, void (*movementModifier)(Object *, void *), void *args)
+{
+    object->position = position;
+    if (movementModifier != NULL)
+    {
+        movementModifier(object, args);
+    }
+}
+
 void limitMovementToScreen(Object *object, void *screenSizeP)
 {
     Vector2 screenSize = *(Vector2 *)screenSizeP;
