@@ -26,8 +26,7 @@ int main()
     Object debugData = createObject(newVector2((4 + 3) * 8, 16), newDVector2(0, 0)); // 4 - 'FPS: ', 3 - number
     fillBuffer(&debugData.buffer, ' ');
 
-    Timer *timer = createTimer();
-    int fps = 0;
+    GameTimer *timer = createGameTimer();
     int speed = 50;
     while (1)
     {
@@ -35,7 +34,7 @@ int main()
         renderToScreen(&screen, &player, RED, GREEN_BG);
 
         fillBuffer(&debugData.buffer, ' ');
-        sprintf(debugData.buffer.data, "FPS: %d", fps);
+        sprintf(debugData.buffer.data, "FPS: %d", timer->fps);
         renderToScreen(&screen, &debugData, WHITE, BLACK_BG);
 
         if (isKeyPressed(KEY_LEFT) || isKeyPressed(KEY_A))
@@ -65,10 +64,7 @@ int main()
             break;
         }
 
-        updateTimer(timer);
-        if (timer->deltaTime != 0)
-            fps = 1000 / timer->deltaTime;
-
+        updateGameTimer(timer);
         Sleep(1);
     }
 

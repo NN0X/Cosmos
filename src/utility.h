@@ -2,15 +2,17 @@
 #define UTILITY_H
 
 #include <windows.h>
+#include "vector.h"
 
-struct Timer
+struct GameTimer
 {
     LARGE_INTEGER frequency;
     LARGE_INTEGER time;
+    int fps;
     int deltaTime;
-} typedef Timer;
+} typedef GameTimer;
 
-Timer *createTimer();
-void updateTimer(Timer *timer);
+GameTimer *createGameTimer();
+void updateGameTimer(GameTimer *timer);
 
 #endif
